@@ -11,7 +11,6 @@ interface EducationData {
   fieldOfStudy: string;
   startYear: string;
   endYear: string;
-  grade: string;
   description: string;
 }
 
@@ -37,13 +36,10 @@ const EducationList: React.FC<EducationListProps> = ({ educations }) => {
     <EducationContainer>
       {educations.slice().reverse().map((education, index) => (
         <EducationItem key={index}>
-          <EducationHeader>{education.school}</EducationHeader>
-          <p>{education.degree}</p>
-          <p>Field of Study: {education.fieldOfStudy}</p>
+          <EducationHeader>{education.degree} {education.fieldOfStudy} @ {education.school}</EducationHeader>
           <p>Start Year: {education.startYear}</p>
           <p>End Year (or expected): {education.endYear}</p>
-          <p>Grade: {education.grade}</p>
-          <p>Description: {education.description}</p>
+          <p>{education.description}</p>
         </EducationItem>
       ))}
     </EducationContainer>
