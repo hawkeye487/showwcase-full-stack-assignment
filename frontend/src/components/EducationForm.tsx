@@ -1,8 +1,6 @@
-import React, { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from 'react-modal';
-// import DatePicker from 'react-datepicker';
-// import 'react-datepicker/dist/react-datepicker.css';
 import useSWR from 'swr';
 
 interface EducationFormProps {
@@ -52,11 +50,11 @@ const FormLabel = styled.label`
 `;
 
 const InputField = styled.input`
-width: 100%;
-padding: 8px;
-margin: 5px 0 10px;
-border: 1px solid #ccc;
-border-radius: 4px;
+	width: 100%;
+	padding: 8px;
+	margin: 5px 0 10px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
 `;
 
 const SelectField = styled.select`
@@ -65,7 +63,7 @@ const SelectField = styled.select`
 	// margin-bottom: 16px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
-  flex: 0.45;
+	flex: 0.45;
 `;
 
 const DatePickerContainer = styled.div`
@@ -96,7 +94,7 @@ const ButtonContainer = styled.div`
 const Button = styled.button`
 	padding: 8px 16px;
 	background-color: #292929;
-	color: #f3f3f3;;
+	color: #f3f3f3;
 	border: none;
 	border-radius: 4px;
 	cursor: pointer;
@@ -139,6 +137,9 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	const [endMonth, setEndMonth] = useState<string>('');
 	const [endYear, setEndYear] = useState<string>('');
 	const [description, setDescription] = useState<string>('');
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+
+	const [debouncedSchool, setDebouncedSchool] = useState<string>('');
 
 	const currentYear = new Date().getFullYear();
 	const years = Array.from({ length: currentYear - 1950 + 1 }, (_, index) =>
@@ -152,19 +153,33 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	};
 
 	const { data: suggestions } = useSWR<{ name: string }[]>(
-		school
-			? `http://universities.hipolabs.com/search?name=${school}`
+		debouncedSchool
+			? `http://universities.hipolabs.com/search?name=${debouncedSchool}`
 			: null,
 		fetcher
 	);
 
-	const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
-		setSchool(event.target.value);
-	};
+	useEffect(() => {
+		const timer = setTimeout(() => {
+			setDebouncedSchool(school);
+		}, 600); 
 
-	const handleSuggestionSelect = (selectedSchool: string) => {
-		setSchool(selectedSchool);
+		return () => {
+			clearTimeout(timer);
+		};
+	}, [school]);
+
+	const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
+		const inputValue = event.target.value;
+		setSchool(inputValue);
+		setDebouncedSchool(inputValue);
+    setShowSuggestions(true);
 	};
+  const handleSuggestionSelect = (selectedSchool: string) => {
+    setSchool(selectedSchool);
+    setDebouncedSchool(selectedSchool);
+    setShowSuggestions(false);
+  };
 
 	const handleSubmit = () => {
 		// Validate the data if needed
@@ -250,20 +265,18 @@ const EducationForm: React.FC<EducationFormProps> = ({
 					placeholder='Search for School Name'
 				/>
 				{/* Suggestions dropdown */}
-				{suggestions && suggestions.length > 0 && (
-					<SuggestionsDropdown>
-						{suggestions.map((suggestion, index) => (
-							<Option
-								key={index}
-								onClick={() =>
-									handleSuggestionSelect(suggestion.name)
-								}
-							>
-								{suggestion.name}
-							</Option>
-						))}
-					</SuggestionsDropdown>
-				)}
+        {showSuggestions && suggestions && suggestions.length > 0 && (
+          <SuggestionsDropdown>
+            {suggestions.map((suggestion, index) => (
+              <Option
+                key={index}
+                onClick={() => handleSuggestionSelect(suggestion.name)}
+              >
+                {suggestion.name}
+              </Option>
+            ))}
+          </SuggestionsDropdown>
+        )}
 				<FormLabel>Degree</FormLabel>
 				<InputField
 					type='text'
@@ -278,9 +291,8 @@ const EducationForm: React.FC<EducationFormProps> = ({
 					onChange={(e) => setFieldOfStudy(e.target.value)}
 					placeholder='Field of Study'
 				/>
-        <DateLabel>Start Date:</DateLabel>
+				<DateLabel>Start Date</DateLabel>
 				<DatePickerContainer>
-					
 					<SelectField
 						value={startMonth}
 						onChange={(e) => setStartMonth(e.target.value)}
@@ -288,6 +300,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						<option value=''>Select Month</option>
 						<option value='January'>January</option>
 						<option value='February'>February</option>
+						<option value='March'>March</option>
+						<option value='April'>April</option>
+						<option value='May'>May</option>
+						<option value='June'>June</option>
+						<option value='July'>July</option>
+						<option value='August'>August</option>
+						<option value='September'>September</option>
+						<option value='October'>October</option>
+						<option value='November'>November</option>
+						<option value='December'>December</option>
 						{/* Add more months here */}
 					</SelectField>
 					<SelectField
@@ -302,9 +324,8 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						))}
 					</SelectField>
 				</DatePickerContainer>
-        <DateLabel>End Date (or expected):</DateLabel>
+				<DateLabel>End Date (or expected)</DateLabel>
 				<DatePickerContainer>
-					
 					<SelectField
 						value={endMonth}
 						onChange={(e) => setEndMonth(e.target.value)}
@@ -312,7 +333,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						<option value=''>Select Month</option>
 						<option value='January'>January</option>
 						<option value='February'>February</option>
-						{/* Add more months here */}
+						<option value='March'>March</option>
+						<option value='April'>April</option>
+						<option value='May'>May</option>
+						<option value='June'>June</option>
+						<option value='July'>July</option>
+						<option value='August'>August</option>
+						<option value='September'>September</option>
+						<option value='October'>October</option>
+						<option value='November'>November</option>
+						<option value='December'>December</option>
 					</SelectField>
 					<SelectField
 						value={endYear}
@@ -336,7 +366,11 @@ const EducationForm: React.FC<EducationFormProps> = ({
 					<Button onClick={handleSubmit}>Save</Button>
 					<Button
 						onClick={handleCancel}
-						style={{ backgroundColor: 'transparent', color: '#292929', border: '1px solid #292929'  }}
+						style={{
+							backgroundColor: 'transparent',
+							color: '#292929',
+							border: '1px solid #292929',
+						}}
 					>
 						Cancel
 					</Button>
