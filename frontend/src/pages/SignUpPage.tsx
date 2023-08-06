@@ -1,15 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
-// import { useClerk } from '@clerk/clerk-react';
-// import { useNavigate } from 'react-router-dom';
 
 import {
-	// ClerkProvider,
-	// SignedIn,
-	// SignedOut,
-	// RedirectToSignIn,
 	SignUp,
-	// UserButton,
 } from '@clerk/clerk-react';
 
 const SignUpContainer = styled.div`
@@ -20,15 +13,6 @@ const SignUpContainer = styled.div`
 `;
 
 const SignUpPage: React.FC = () => {
-	//   const { authenticated } = useClerk();
-	//   const navigate = useNavigate();
-
-	//   React.useEffect(() => {
-	//     if (authenticated) {
-	//       navigate('/main'); // Redirect to the main page if the user is already signed in
-	//     }
-	//   }, [authenticated, navigate]);
-
 	return (
 		<SignUpContainer>
 			<SignUp
