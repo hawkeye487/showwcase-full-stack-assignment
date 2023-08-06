@@ -51,7 +51,7 @@ const LandingPage: React.FC = () => {
 		<LandingContainer>
 			<Title>Hi there 👋! Welcome to showwcase !</Title>
 			<ButtonContainer>
-				<GetStartedButton to='/get-started'>Get Started</GetStartedButton>
+				<GetStartedButton to='/sign-up'>Get Started</GetStartedButton>
 			</ButtonContainer>
                 <SignInSection>Already have an account ? <Link to='/sign-in'>Log in here</Link></SignInSection>
 		</LandingContainer>

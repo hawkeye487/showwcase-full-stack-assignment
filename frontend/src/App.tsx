@@ -1,15 +1,13 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Main from './pages/Main';
+import { BrowserRouter as Router } from 'react-router-dom';
+// import { SignIn, SignUp, UserButton } from '@clerk/clerk-react';
+import './App.css';
+import ClerkProviderWithRoutes from './clerk/ClerkProviderWithRoutes';
 
 const App: React.FC = () => {
 	return (
 		<Router>
-			<Routes>
-				<Route path='/' element={<Home />} />
-				<Route path='/main' element={<Main />} />
-			</Routes>
+			<ClerkProviderWithRoutes />
 		</Router>
 	);
 };
