@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import EducationForm from './EducationForm';
-import EducationList from './EducationList';
+import EducationForm from '../components/EducationForm';
+import EducationList from '../components/EducationList';
 import styled from 'styled-components';
 
 const MainContainer = styled.div`
