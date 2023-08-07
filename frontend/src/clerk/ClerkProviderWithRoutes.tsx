@@ -10,6 +10,7 @@ import Main from '../pages/Main';
 import LandingPage from '../pages/LandingPage';
 import SignInPage from '../pages/SignInPage';
 import SignUpPage from '../pages/SignUpPage';
+import { QueryClientWrapper } from '../query/queryClient';
 
 if (!import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY) {
 	throw new Error('Missing Publishable Key');
@@ -25,49 +26,51 @@ const ClerkProviderWithRoutes: React.FC = () => {
 			publishableKey={clerkPubKey}
 			navigate={(to) => navigate(to)}
 		>
-			<Routes>
-				<Route
-					path='/'
-					element={
-						<>
-							<SignedIn>
-								<Main />
-							</SignedIn>
-							<SignedOut>
-								<LandingPage />
-							</SignedOut>
-						</>
-					}
-				/>
-				<Route
-					path='/get-started'
-					element={
-						<>
-							<SignedIn>
-								<GetStarted />
-							</SignedIn>
-							{/* <SignedOut>
+			<QueryClientWrapper>
+				<Routes>
+					<Route
+						path='/'
+						element={
+							<>
+								<SignedIn>
+									<Main />
+								</SignedIn>
+								<SignedOut>
+									<LandingPage />
+								</SignedOut>
+							</>
+						}
+					/>
+					<Route
+						path='/get-started'
+						element={
+							<>
+								<SignedIn>
+									<GetStarted />
+								</SignedIn>
+								{/* <SignedOut>
                         <GetStarted />
                     </SignedOut> */}
-						</>
-					}
-				/>
-				<Route path='/sign-in/*' element={<SignInPage />} />
-				<Route path='/sign-up/*' element={<SignUpPage />} />
-				<Route
-					path='/main'
-					element={
-						<>
-							<SignedIn>
-								<Main />
-							</SignedIn>
-							<SignedOut>
-								<RedirectToSignIn />
-							</SignedOut>
-						</>
-					}
-				/>
-			</Routes>
+							</>
+						}
+					/>
+					<Route path='/sign-in/*' element={<SignInPage />} />
+					<Route path='/sign-up/*' element={<SignUpPage />} />
+					<Route
+						path='/main'
+						element={
+							<>
+								<SignedIn>
+									<Main />
+								</SignedIn>
+								<SignedOut>
+									<RedirectToSignIn />
+								</SignedOut>
+							</>
+						}
+					/>
+				</Routes>
+			</QueryClientWrapper>
 		</ClerkProvider>
 	);
 };

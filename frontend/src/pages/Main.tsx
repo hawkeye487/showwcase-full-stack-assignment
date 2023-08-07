@@ -2,6 +2,18 @@ import React, { useState } from 'react';
 import EducationForm from '../components/EducationForm';
 import EducationList from '../components/EducationList';
 import styled from 'styled-components';
+import { useAuth } from '@clerk/clerk-react';
+import { useQueryClient, useQuery } from 'react-query';
+import Loading from '../components/Loading';
+
+interface EducationData {
+	school: string;
+	degree: string;
+	fieldOfStudy: string;
+	startYear: string;
+	endYear: string;
+	description: string;
+}
 
 const MainContainer = styled.div`
 	display: flex;
@@ -45,15 +57,57 @@ const SidePanel = styled.div`
 	padding: 20px;
 `;
 
+const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
+
 const Main: React.FC = () => {
+	const { userId, getToken } = useAuth();
+
+	console.log({ userId });
+
 	const [showModal, setShowModal] = useState(false);
-	const [educations, setEducations] = useState<EducationData[]>([]);
 	const [selectedEducationIndex, setSelectedEducationIndex] = useState<
 		number | null
 	>(null);
 
+	const queryClient = useQueryClient();
+
+	// Use React Query to fetch education data
+	const {
+		isLoading,
+		error,
+		data: educations,
+	} = useQuery<EducationData[]>(
+		'educations',
+		async () => {
+			const token = await getToken();
+			const response = await fetch(`${BASE_URL}/education`, {
+				headers: {
+					Authorization: `Bearer ${token}`,
+				},
+			});
+
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
+			}
+
+			return response.json();
+		},
+		{
+			// Refetch the data on window focus or when the component mounts
+			refetchOnWindowFocus: true,
+			initialData:
+				queryClient.getQueryData<EducationData[]>('educations'), // Use initial data from the cache, if available
+		}
+	);
+
+	if (isLoading) return <Loading />;
+	if (error) return <div>Error fetching data: {error.message}</div>;
+
 	const handleAddEducation = (newEducation: EducationData) => {
-		setEducations([newEducation, ...educations]);
+		queryClient.setQueryData<EducationData[]>('educations', (prevData) => [
+			newEducation,
+			...prevData,
+		]);
 		setShowModal(false);
 		setSelectedEducationIndex(0);
 	};
@@ -71,7 +125,7 @@ const Main: React.FC = () => {
 				</AddButton>
 			</ContentContainer>
 			<EducationWrapper>
-				{educations.length > 0 && selectedEducationIndex !== null && (
+				{educations && educations.length > 0 && (
 					<SidePanel>
 						<h3>Education Highlights</h3>
 						<ul>
@@ -92,7 +146,7 @@ const Main: React.FC = () => {
 					</SidePanel>
 				)}
 				<EducationList
-					educations={educations}
+					educations={educations || []}
 					onSelect={handleSelectEducation}
 				/>
 			</EducationWrapper>
