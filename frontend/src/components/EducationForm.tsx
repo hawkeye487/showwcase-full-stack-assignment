@@ -117,6 +117,12 @@ const Option = styled.div`
 	}
 `;
 
+const MandatoryFieldMessage = styled.span`
+	color: red;
+	font-size: 12px;
+	margin-top: 4px;
+`;
+
 const EducationForm: React.FC<EducationFormProps> = ({
 	isOpen,
 	onClose,
@@ -253,7 +259,15 @@ const EducationForm: React.FC<EducationFormProps> = ({
 					</ModalTitle>
 					<CloseButton onClick={handleCancel}>X</CloseButton>
 				</ModalHeader>
-				<FormLabel>School Name</FormLabel>
+				<FormLabel>
+					School Name
+					{education.school === '' && (
+						<MandatoryFieldMessage>
+							{' '}
+							(Required)
+						</MandatoryFieldMessage>
+					)}
+				</FormLabel>
 				<InputField
 					type='text'
 					value={education.school}
@@ -275,7 +289,15 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						))}
 					</SuggestionsDropdown>
 				)}
-				<FormLabel>Degree</FormLabel>
+				<FormLabel>
+					Degree
+					{education.degree === '' && (
+						<MandatoryFieldMessage>
+							{' '}
+							(Required)
+						</MandatoryFieldMessage>
+					)}
+				</FormLabel>
 				<InputField
 					type='text'
 					value={education.degree}
@@ -287,7 +309,15 @@ const EducationForm: React.FC<EducationFormProps> = ({
 					}
 					placeholder='Degree'
 				/>
-				<FormLabel>Field of Study</FormLabel>
+				<FormLabel>
+					Field of Study
+					{education.fieldOfStudy === '' && (
+						<MandatoryFieldMessage>
+							{' '}
+							(Required)
+						</MandatoryFieldMessage>
+					)}
+				</FormLabel>
 				<InputField
 					type='text'
 					value={education.fieldOfStudy}
@@ -299,7 +329,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
 					}
 					placeholder='Field of Study'
 				/>
-				<DateLabel>Start Date</DateLabel>
+				<DateLabel>
+					Start Date
+					{(education.startMonth === '' ||
+						education.startYear === '') && (
+						<MandatoryFieldMessage>
+							{' '}
+							(Required)
+						</MandatoryFieldMessage>
+					)}
+				</DateLabel>
 				<DatePickerContainer>
 					<SelectField
 						value={education.startMonth}
@@ -342,7 +381,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						))}
 					</SelectField>
 				</DatePickerContainer>
-				<DateLabel>End Date (or expected)</DateLabel>
+				<DateLabel>
+					End Date (or expected){' '}
+					{(education.endMonth === '' ||
+						education.endYear === '') && (
+						<MandatoryFieldMessage>
+							{' '}
+							(Required)
+						</MandatoryFieldMessage>
+					)}
+				</DateLabel>
 				<DatePickerContainer>
 					<SelectField
 						value={education.endMonth}
