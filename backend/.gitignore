@@ -21,3 +21,6 @@ yarn-error.log*
 
 # Mac-specific files
 .DS_Store
+
+# prisma migrations
+/prisma/migrations
