@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import EducationForm from '../components/EducationForm';
 import EducationList from '../components/EducationList';
 import styled from 'styled-components';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, UserButton } from '@clerk/clerk-react';
 import { useQueryClient, useQuery, useMutation } from 'react-query';
 import Loading from '../components/Loading';
 import { EducationData } from '../types/types';
@@ -15,7 +15,6 @@ const MainContainer = styled.div`
 	font-family: 'Roboto', sans-serif;
 	flex-direction: column;
 `;
-
 const ContentContainer = styled.div`
 	flex: 1;
 	min-height: 25vh;
@@ -61,6 +60,12 @@ const EducationHighlightItem = styled.li<{ isSelected: boolean }>`
 	border-radius: 4px;
 
 	color: ${({ isSelected }) => (isSelected ? 'black' : 'grey')};
+`;
+
+const UserButtonWrapper = styled.div`
+	position: absolute;
+	top: 7%;
+	right: 7%;
 `;
 
 const Main: React.FC = () => {
@@ -203,6 +208,9 @@ const Main: React.FC = () => {
 
 	return (
 		<MainContainer>
+			<UserButtonWrapper UserButtonWrapper>
+				<UserButton />
+			</UserButtonWrapper>
 			<ContentContainer>
 				<h2>Main Screen</h2>
 				<AddButton onClick={() => setShowModal(true)}>
