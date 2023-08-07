@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, useEffect } from 'react';
 import styled from 'styled-components';
 import Modal from 'react-modal';
 import useSWR from 'swr';
+import { EducationData } from '../types/types';
 
 interface EducationFormProps {
 	isOpen: boolean;
@@ -11,18 +12,6 @@ interface EducationFormProps {
 	editEducationData?: EducationData | null;
 	onUpdate?: (education: EducationData) => void;
 	setIsEditing?: (isEditing: boolean) => void;
-}
-
-interface EducationData {
-	id: number;
-	school: string;
-	degree: string;
-	fieldOfStudy: string;
-	startMonth: string;
-	startYear: string;
-	endMonth: string;
-	endYear: string;
-	description: string;
 }
 
 const ModalHeader = styled.div`
@@ -135,7 +124,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	isEditing = false,
 	editEducationData,
 	onUpdate,
-	setIsEditing
+	setIsEditing,
 }) => {
 	const initialEducationState: EducationData = {
 		id: 0,
@@ -158,13 +147,12 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	useEffect(() => {
 		// Reset the state when the modal is closed
 		console.log('isOpen', isOpen);
-		
+
 		if (!isOpen) {
 			setEducation(initialEducationState);
 			setShowSuggestions(false);
 			setIsEditing(false);
-			console.log({isEditing});
-			
+			console.log({ isEditing });
 		}
 	}, [isOpen]);
 
@@ -192,7 +180,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 		} else {
 			setEducation(initialEducationState);
 		}
-	}, [ isEditing, editEducationData]);
+	}, [isEditing, editEducationData]);
 
 	const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const inputValue = event.target.value;
