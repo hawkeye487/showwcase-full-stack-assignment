@@ -1,12 +1,12 @@
-import { Request, Response } from 'express'
 import prisma from '../../prisma/client'
 
-export const getAllEducationByUserId = async (req: Request, res: Response) => {
-  // * need to change it ! This is a hard coded value
-  const userId = 'user_2TblwQTF8yTLK3tGeKqCRcEpCg2' // Retrieve the userId from the request object
+export const getAllEducationByUserId = async (req, res) => {
+  const userId = req?.auth?.userId
+
+  console.log(req?.auth?.userId)
 
   try {
-    const education = await prisma.education.findMany({ where: { userId } })
+    const education = await prisma.education.findMany({ where: { userId: userId } })
 
     res.json(education)
   } catch (error) {
@@ -15,12 +15,9 @@ export const getAllEducationByUserId = async (req: Request, res: Response) => {
   }
 }
 
-export const createEducation = async (req: Request, res: Response) => {
+export const createEducation = async (req, res) => {
   const { school, degree, fieldOfStudy, startDate, endDate, description } = req.body
-
-  // * need to change it ! This is a hard coded value
-  const userId = 'user_2TblwQTF8yTLK3tGeKqCRcEpCg2'
-  // const userId = req.userId; // Retrieve the userId from the request object
+  const userId = req?.auth?.userId
 
   try {
     const newEducation = await prisma.education.create({
@@ -42,12 +39,10 @@ export const createEducation = async (req: Request, res: Response) => {
   }
 }
 
-export const deleteEducation = async (req: Request, res: Response) => {
+export const deleteEducation = async (req, res) => {
   const { educationId } = req.params
 
-  // * need to change it ! This is a hard coded value
-  const userId = 'user_2TblwQTF8yTLK3tGeKqCRcEpCg2'
-  // const userId = req.userId; // Retrieve the userId from the request object
+  const userId = req?.auth?.userId
 
   try {
     // Check if the education row belongs to the user before deleting
@@ -67,12 +62,10 @@ export const deleteEducation = async (req: Request, res: Response) => {
   }
 }
 
-export const updateEducation = async (req: Request, res: Response) => {
+export const updateEducation = async (req, res) => {
   const { educationId } = req.params
 
-  // * need to change it ! This is a hard coded value
-  const userId = 'user_2TblwQTF8yTLK3tGeKqCRcEpCg2'
-  // const userId = req.userId; // Retrieve the userId from the request object
+  const userId = req?.auth?.userId
 
   try {
     // Check if the education row belongs to the user before updating
