@@ -10,6 +10,7 @@ interface EducationFormProps {
 }
 
 interface EducationData {
+	id: number;
 	school: string;
 	degree: string;
 	fieldOfStudy: string;
