@@ -1,10 +1,10 @@
-// EducationList.tsx
 import React from 'react';
 import styled from 'styled-components';
 import { FaUniversity, FaCalendarAlt, FaEdit, FaTrash } from 'react-icons/fa';
 
 interface EducationListProps {
   educations: EducationData[];
+  onEdit: (education: EducationData) => void;
   onDelete: (id: number) => void;
 }
 
@@ -37,10 +37,6 @@ const EducationCard = styled.div`
 
 const EducationHeader = styled.h3`
   margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  font-size: 18px;
-  font-weight: 500;
 `;
 
 const SchoolIcon = styled(FaUniversity)`
@@ -103,6 +99,7 @@ const DeleteButton = styled.button`
 
 const EducationList: React.FC<EducationListProps> = ({
   educations,
+  onEdit,
   onDelete,
 }) => {
   return (
@@ -112,7 +109,7 @@ const EducationList: React.FC<EducationListProps> = ({
         .reverse()
         .map((education) => (
           <EducationCard key={education.id}>
-            <EditButton>
+            <EditButton onClick={() => onEdit(education)}>
               <FaEdit />
             </EditButton>
             <DeleteButton onClick={() => onDelete(education.id)}>

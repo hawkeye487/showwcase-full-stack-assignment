@@ -7,6 +7,10 @@ interface EducationFormProps {
 	isOpen: boolean;
 	onClose: () => void;
 	onSubmit: (education: EducationData) => void;
+	isEditing?: boolean;
+	editEducationData?: EducationData | null;
+	onUpdate?: (education: EducationData) => void;
+	setIsEditing?: (isEditing: boolean) => void;
 }
 
 interface EducationData {
@@ -61,7 +65,6 @@ const InputField = styled.input`
 const SelectField = styled.select`
 	width: 100%;
 	padding: 8px;
-	// margin-bottom: 16px;
 	border: 1px solid #ccc;
 	border-radius: 4px;
 	flex: 0.45;
@@ -129,18 +132,41 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	isOpen,
 	onClose,
 	onSubmit,
+	isEditing = false,
+	editEducationData,
+	onUpdate,
+	setIsEditing
 }) => {
-	const [school, setSchool] = useState<string>('');
-	const [degree, setDegree] = useState<string>('');
-	const [fieldOfStudy, setFieldOfStudy] = useState<string>('');
-	const [startMonth, setStartMonth] = useState<string>('');
-	const [startYear, setStartYear] = useState<string>('');
-	const [endMonth, setEndMonth] = useState<string>('');
-	const [endYear, setEndYear] = useState<string>('');
-	const [description, setDescription] = useState<string>('');
-  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+	const initialEducationState: EducationData = {
+		id: 0,
+		school: '',
+		degree: '',
+		fieldOfStudy: '',
+		startMonth: '',
+		startYear: '',
+		endMonth: '',
+		endYear: '',
+		description: '',
+	};
 
-	const [debouncedSchool, setDebouncedSchool] = useState<string>('');
+	const [education, setEducation] = useState<EducationData>(
+		initialEducationState
+	);
+	const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
+	// const [isEditing , setIsEditing] = useState<boolean>(false);
+
+	useEffect(() => {
+		// Reset the state when the modal is closed
+		console.log('isOpen', isOpen);
+		
+		if (!isOpen) {
+			setEducation(initialEducationState);
+			setShowSuggestions(false);
+			setIsEditing(false);
+			console.log({isEditing});
+			
+		}
+	}, [isOpen]);
 
 	const currentYear = new Date().getFullYear();
 	const years = Array.from({ length: currentYear - 1950 + 1 }, (_, index) =>
@@ -154,87 +180,66 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	};
 
 	const { data: suggestions } = useSWR<{ name: string }[]>(
-		debouncedSchool
-			? `http://universities.hipolabs.com/search?name=${debouncedSchool}`
+		education.school
+			? `http://universities.hipolabs.com/search?name=${education.school}`
 			: null,
 		fetcher
 	);
 
 	useEffect(() => {
-		const timer = setTimeout(() => {
-			setDebouncedSchool(school);
-		}, 600); 
-
-		return () => {
-			clearTimeout(timer);
-		};
-	}, [school]);
+		if (isEditing && editEducationData) {
+			setEducation(editEducationData);
+		} else {
+			setEducation(initialEducationState);
+		}
+	}, [ isEditing, editEducationData]);
 
 	const handleSearchChange = (event: ChangeEvent<HTMLInputElement>) => {
 		const inputValue = event.target.value;
-		setSchool(inputValue);
-		setDebouncedSchool(inputValue);
-    setShowSuggestions(true);
+		setEducation((prevEducation) => ({
+			...prevEducation,
+			school: inputValue,
+		}));
+		setShowSuggestions(true);
 	};
-  const handleSuggestionSelect = (selectedSchool: string) => {
-    setSchool(selectedSchool);
-    setDebouncedSchool(selectedSchool);
-    setShowSuggestions(false);
-  };
+
+	const handleSuggestionSelect = (selectedSchool: string) => {
+		setEducation((prevEducation) => ({
+			...prevEducation,
+			school: selectedSchool,
+		}));
+		setShowSuggestions(false);
+	};
 
 	const handleSubmit = () => {
 		// Validate the data if needed
 		if (
-			!school ||
-			!degree ||
-			!fieldOfStudy ||
-			!startMonth ||
-			!startYear ||
-			!endMonth ||
-			!endYear
+			!education.school ||
+			!education.degree ||
+			!education.fieldOfStudy ||
+			!education.startMonth ||
+			!education.startYear ||
+			!education.endMonth ||
+			!education.endYear
 		) {
 			alert('Please fill in all mandatory fields.');
 			return;
 		}
 
-		// Create an education object with the form data
-		const newEducation: EducationData = {
-			school,
-			degree,
-			fieldOfStudy,
-			startMonth,
-			startYear,
-			endMonth,
-			endYear,
-			description,
-		};
-
-		onSubmit(newEducation);
+		if (isEditing && onUpdate) {
+			onUpdate(education);
+		} else {
+			onSubmit(education);
+		}
 
 		// Clear the form fields after submitting
-		setSchool('');
-		setDegree('');
-		setFieldOfStudy('');
-		setStartMonth('');
-		setStartYear('');
-		setEndMonth('');
-		setEndYear('');
-		setDescription('');
-
+		setEducation(initialEducationState);
 		onClose();
 	};
 
 	const handleCancel = () => {
 		// Clear the form fields on cancel
-		setSchool('');
-		setDegree('');
-		setFieldOfStudy('');
-		setStartMonth('');
-		setStartYear('');
-		setEndMonth('');
-		setEndYear('');
-		setDescription('');
-
+		setEducation(initialEducationState);
 		onClose();
 	};
 
@@ -255,48 +260,67 @@ const EducationForm: React.FC<EducationFormProps> = ({
 		>
 			<ModalContent>
 				<ModalHeader>
-					<ModalTitle>Add new Education</ModalTitle>
+					<ModalTitle>
+						{isEditing ? 'Edit Education' : 'Add new Education'}
+					</ModalTitle>
 					<CloseButton onClick={handleCancel}>X</CloseButton>
 				</ModalHeader>
 				<FormLabel>School Name</FormLabel>
 				<InputField
 					type='text'
-					value={school}
+					value={education.school}
 					onChange={handleSearchChange}
 					placeholder='Search for School Name'
 				/>
 				{/* Suggestions dropdown */}
-        {showSuggestions && suggestions && suggestions.length > 0 && (
-          <SuggestionsDropdown>
-            {suggestions.map((suggestion, index) => (
-              <Option
-                key={index}
-                onClick={() => handleSuggestionSelect(suggestion.name)}
-              >
-                {suggestion.name}
-              </Option>
-            ))}
-          </SuggestionsDropdown>
-        )}
+				{showSuggestions && suggestions && suggestions.length > 0 && (
+					<SuggestionsDropdown>
+						{suggestions.map((suggestion, index) => (
+							<Option
+								key={index}
+								onClick={() =>
+									handleSuggestionSelect(suggestion.name)
+								}
+							>
+								{suggestion.name}
+							</Option>
+						))}
+					</SuggestionsDropdown>
+				)}
 				<FormLabel>Degree</FormLabel>
 				<InputField
 					type='text'
-					value={degree}
-					onChange={(e) => setDegree(e.target.value)}
+					value={education.degree}
+					onChange={(e) =>
+						setEducation((prevEducation) => ({
+							...prevEducation,
+							degree: e.target.value,
+						}))
+					}
 					placeholder='Degree'
 				/>
 				<FormLabel>Field of Study</FormLabel>
 				<InputField
 					type='text'
-					value={fieldOfStudy}
-					onChange={(e) => setFieldOfStudy(e.target.value)}
+					value={education.fieldOfStudy}
+					onChange={(e) =>
+						setEducation((prevEducation) => ({
+							...prevEducation,
+							fieldOfStudy: e.target.value,
+						}))
+					}
 					placeholder='Field of Study'
 				/>
 				<DateLabel>Start Date</DateLabel>
 				<DatePickerContainer>
 					<SelectField
-						value={startMonth}
-						onChange={(e) => setStartMonth(e.target.value)}
+						value={education.startMonth}
+						onChange={(e) =>
+							setEducation((prevEducation) => ({
+								...prevEducation,
+								startMonth: e.target.value,
+							}))
+						}
 					>
 						<option value=''>Select Month</option>
 						<option value='January'>January</option>
@@ -314,8 +338,13 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						{/* Add more months here */}
 					</SelectField>
 					<SelectField
-						value={startYear}
-						onChange={(e) => setStartYear(e.target.value)}
+						value={education.startYear}
+						onChange={(e) =>
+							setEducation((prevEducation) => ({
+								...prevEducation,
+								startYear: e.target.value,
+							}))
+						}
 					>
 						<option value=''>Select Year</option>
 						{years.map((year) => (
@@ -328,8 +357,13 @@ const EducationForm: React.FC<EducationFormProps> = ({
 				<DateLabel>End Date (or expected)</DateLabel>
 				<DatePickerContainer>
 					<SelectField
-						value={endMonth}
-						onChange={(e) => setEndMonth(e.target.value)}
+						value={education.endMonth}
+						onChange={(e) =>
+							setEducation((prevEducation) => ({
+								...prevEducation,
+								endMonth: e.target.value,
+							}))
+						}
 					>
 						<option value=''>Select Month</option>
 						<option value='January'>January</option>
@@ -346,8 +380,13 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						<option value='December'>December</option>
 					</SelectField>
 					<SelectField
-						value={endYear}
-						onChange={(e) => setEndYear(e.target.value)}
+						value={education.endYear}
+						onChange={(e) =>
+							setEducation((prevEducation) => ({
+								...prevEducation,
+								endYear: e.target.value,
+							}))
+						}
 					>
 						<option value=''>Select Year</option>
 						{years.map((year) => (
@@ -359,12 +398,19 @@ const EducationForm: React.FC<EducationFormProps> = ({
 				</DatePickerContainer>
 				<FormLabel>Description</FormLabel>
 				<DescriptionField
-					value={description}
-					onChange={(e) => setDescription(e.target.value)}
+					value={education.description}
+					onChange={(e) =>
+						setEducation((prevEducation) => ({
+							...prevEducation,
+							description: e.target.value,
+						}))
+					}
 					placeholder='Description'
 				/>
 				<ButtonContainer>
-					<Button onClick={handleSubmit}>Save</Button>
+					<Button onClick={handleSubmit}>
+						{isEditing ? 'Update' : 'Save'}
+					</Button>
 					<Button
 						onClick={handleCancel}
 						style={{
