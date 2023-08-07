@@ -7,13 +7,20 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id     Int    @id @default(autoincrement())
+  userId String @unique
+  name   String
+}
 model Education {
-  id          Int       @id @default(autoincrement())
-  userId      String    
-  school      String
-  degree      String
+  id           Int     @id @default(autoincrement())
+  userId       String
+  school       String
+  degree       String
   fieldOfStudy String
-  startDate   String
-  endDate     String?
-  description String?
+  startMonth   String
+  startYear    String
+  endMonth     String
+  endYear      String
+  description  String?
 }

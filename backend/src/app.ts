@@ -5,6 +5,7 @@ import cors from 'cors'
 import helmet from 'helmet'
 import bodyParser from 'body-parser'
 import educationRoute from './routes/educationRoute'
+import userRoute from './routes/userRoute'
 
 const app: Application = express()
 const port = process.env.PORT || 3000
@@ -32,6 +33,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 // Use the educationRoute
 app.use('/', educationRoute)
+app.use('/user', userRoute)
 
 // Start the server
 app.listen(port, () => {

@@ -16,7 +16,7 @@ export const getAllEducationByUserId = async (req, res) => {
 }
 
 export const createEducation = async (req, res) => {
-  const { school, degree, fieldOfStudy, startDate, endDate, description } = req.body
+  const { school, degree, fieldOfStudy, startMonth, startYear, endMonth, endYear, description } = req.body
   const userId = req?.auth?.userId
 
   try {
@@ -26,13 +26,16 @@ export const createEducation = async (req, res) => {
         school,
         degree,
         fieldOfStudy,
-        startDate,
-        endDate,
+        startMonth,
+        startYear,
+        endMonth,
+        endYear,
         description
       }
     })
 
     res.json(newEducation)
+    res.status(200)
   } catch (error) {
     console.error('Error creating education:', error)
     res.status(500).json({ error: 'Internal server error' })
