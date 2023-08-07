@@ -6,6 +6,8 @@ interface EducationListProps {
   educations: EducationData[];
   onEdit: (education: EducationData) => void;
   onDelete: (id: number) => void;
+  selectedEducationId: number | null;
+  onHoverEducation: (id: number | null) => void;
 }
 
 interface EducationData {
@@ -24,15 +26,18 @@ const EducationContainer = styled.div`
   flex: 0.7;
 `;
 
-const EducationCard = styled.div`
-  background-color: #f7f7f7;
+const EducationCard = styled.div<{ isSelected: boolean }>`
+  background-color: #f7f7f7 ;
+  background-image: ${({ isSelected }) =>
+    isSelected ? 'linear-gradient(90deg,#F4F4F4 0%,#EFEFEF 100%);' : ''};
   border: 1px solid #ccc;
   border-radius: 8px;
   padding: 16px;
   margin-bottom: 16px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  width: 60%;
+  width: 80%;
   position: relative;
+  cursor: pointer;
 `;
 
 const EducationHeader = styled.h3`
@@ -61,7 +66,8 @@ const YearText = styled.p`
 const DescriptionText = styled.p`
   font-size: 16px;
   font-weight: 400;
-  color: #333; /* Adjust the font color as desired */
+  color: #333;
+  text-wrap: wrap;
 `;
 
 const PlaceholderText = styled.span`
@@ -101,6 +107,8 @@ const EducationList: React.FC<EducationListProps> = ({
   educations,
   onEdit,
   onDelete,
+  selectedEducationId,
+  onHoverEducation,
 }) => {
   return (
     <EducationContainer>
@@ -108,11 +116,23 @@ const EducationList: React.FC<EducationListProps> = ({
         .slice()
         .reverse()
         .map((education) => (
-          <EducationCard key={education.id}>
-            <EditButton onClick={() => onEdit(education)}>
+          <EducationCard
+            key={education.id}
+            isSelected={education.id === selectedEducationId}
+            onMouseEnter={() => onHoverEducation(education.id)}
+            onMouseLeave={() => onHoverEducation(null)}
+            onClick={() => onEdit(education)}
+          >
+            <EditButton onClick={(e) => {
+              e.stopPropagation(); // Prevent click propagation to EducationCard
+              onEdit(education);
+            }}>
               <FaEdit />
             </EditButton>
-            <DeleteButton onClick={() => onDelete(education.id)}>
+            <DeleteButton onClick={(e) => {
+              e.stopPropagation(); // Prevent click propagation to EducationCard
+              onDelete(education.id);
+            }}>
               <FaTrash />
             </DeleteButton>
             <EducationHeader>
