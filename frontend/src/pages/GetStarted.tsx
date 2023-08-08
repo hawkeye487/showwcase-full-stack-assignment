@@ -90,8 +90,8 @@ const GetStarted: React.FC = () => {
 		});
 		const data = await response.json();
 
-		if (data.name) {
-			navigate('/main');
+		if (data?.name) {
+			navigate('/main')
 		}
 	};
 

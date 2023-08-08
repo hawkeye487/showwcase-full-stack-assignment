@@ -6,7 +6,6 @@ const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 
 export const useEducations = () => {
   const { getToken } = useAuth();
-  const queryClient = useQueryClient();
 
   const { isLoading, data: educations, refetch } = useQuery<EducationData[]>(
     'educations',

@@ -11,8 +11,7 @@ import {
 	useUpdateEducation,
 	useDeleteEducation,
 } from '../api/EducationAPI';
-
-const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
+import { fetchUserData } from '../api/UserAPI';
 
 const MainContainer = styled.div`
 	display: flex;
@@ -84,37 +83,23 @@ const Main: React.FC = () => {
 	const [userName, setUserName] = useState('');
 
 	const [showModal, setShowModal] = useState(false);
-	const [selectedEducationId, setSelectedEducationId] = useState<number | null>(null);
-	const [editingEducation, setEditingEducation] = useState<EducationData | null>(null);
+	const [selectedEducationId, setSelectedEducationId] = useState<
+		number | null
+	>(null);
+	const [editingEducation, setEditingEducation] =
+		useState<EducationData | null>(null);
 
 	useEffect(() => {
-		const fetchUserData = async () => {
+		const fetchUserDataAndSetName = async () => {
 			try {
-				// Get the user's access token from Clerk
-				const accessToken = await getToken();
-
-				const response = await fetch(`${BASE_URL}/user`, {
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${accessToken}`, // Include the access token in the request headers
-					},
-				});
-
-				if (!response.ok) {
-					throw new Error('Failed to fetch user data.');
-				}
-
-				const data = await response.json();
-
-				// Set the user's name in the state
-				setUserName(data.name);
+				const name = await fetchUserData(getToken);
+				setUserName(name);
 			} catch (error) {
 				console.error('Error:', error);
-				// Handle the error if needed
 			}
 		};
 
-		fetchUserData();
+		fetchUserDataAndSetName();
 	}, []);
 
 	const { isLoading, educations, refetch } = useEducations();
