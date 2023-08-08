@@ -94,4 +94,14 @@ Frontend is deployed on Vercel and backend is deployed on Render.
 
 Frontend: https://showwcase-full-stack-assignment.vercel.app/
 
-Backend-Base-URL: https://backend-for-showwcase-full-stack.onrender.com/ (you can't acess, you need authorization token to acess it)
+Backend-Base-URL: https://backend-for-showwcase-full-stack.onrender.com/ (you can't access it, you need an authorization token to access it)
+
+## Screenshots
+
+<img width="1788" alt="Screenshot 2023-08-08 at 7 12 16 PM" src="https://github.com/Apra487/showwcase-full-stack-assignment/assets/54775196/3f449dee-2edc-4fc3-adb2-a6642fcb25fd">
+<img width="1787" alt="Screenshot 2023-08-08 at 7 22 21 PM" src="https://github.com/Apra487/showwcase-full-stack-assignment/assets/54775196/3713542e-96fb-4e7c-8a15-5b17f18d6314">
+<img width="1792" alt="Screenshot 2023-08-08 at 7 18 54 PM" src="https://github.com/Apra487/showwcase-full-stack-assignment/assets/54775196/852351e2-666f-4a48-ba84-5f3f7ad55e1a">
+<img width="1791" alt="Screenshot 2023-08-08 at 7 16 50 PM" src="https://github.com/Apra487/showwcase-full-stack-assignment/assets/54775196/1407ec33-e567-4ccd-a04c-3ddda4f6885d">
+
+
+
