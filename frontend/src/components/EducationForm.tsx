@@ -4,6 +4,8 @@ import Modal from 'react-modal';
 import useSWR from 'swr';
 import { EducationData } from '../types/types';
 
+const API_URL = import.meta.env.VITE_SHOW_SUGGESTION_API_URL;
+
 interface EducationFormProps {
 	isOpen: boolean;
 	onClose: () => void;
@@ -175,7 +177,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 
 	const { data: suggestions } = useSWR<{ name: string }[]>(
 		education.school
-			? `http://universities.hipolabs.com/search?name=${education.school}`
+			? `${API_URL}?name=${education.school}`
 			: null,
 		fetcher
 	);
@@ -331,8 +333,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 				/>
 				<DateLabel>
 					Start Date
-					{(education.startMonth === '' ||
-						education.startYear === '') && (
+					{(education.startMonth === '' || education.startYear === '') &&  (
 						<MandatoryFieldMessage>
 							{' '}
 							(Required)
@@ -381,16 +382,12 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						))}
 					</SelectField>
 				</DatePickerContainer>
-				<DateLabel>
-					End Date (or expected){' '}
-					{(education.endMonth === '' ||
-						education.endYear === '') && (
+				<DateLabel>End Date (or expected) {(education.endMonth === '' || education.endYear === '') &&  (
 						<MandatoryFieldMessage>
 							{' '}
 							(Required)
 						</MandatoryFieldMessage>
-					)}
-				</DateLabel>
+					)}</DateLabel>
 				<DatePickerContainer>
 					<SelectField
 						value={education.endMonth}
