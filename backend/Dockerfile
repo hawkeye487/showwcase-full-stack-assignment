@@ -16,5 +16,7 @@ COPY . .
 # Expose the port that the application will run on
 EXPOSE 3000
 
+RUN npx prisma generate
+
 # Start the application with nodemon for hot-reloading during development
 CMD ["npm", "run", "dev"]
