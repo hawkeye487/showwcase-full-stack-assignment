@@ -1,4 +1,4 @@
-# Showcase Full Stack Assignment
+## Showwcase Full Stack Assignment
 
 This repository contains my implementation for the full stack assignment for the Showwcase interview process. The application is a simple educational experience tracker that allows users to add, edit, and delete educational experiences. 
 
