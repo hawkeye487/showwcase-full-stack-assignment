@@ -3,9 +3,14 @@ import EducationForm from '../components/EducationForm';
 import EducationList from '../components/EducationList';
 import styled from 'styled-components';
 import { useAuth, UserButton } from '@clerk/clerk-react';
-import { useQueryClient, useQuery, useMutation } from 'react-query';
 import Loading from '../components/Loading';
 import { EducationData } from '../types/types';
+import {
+	useEducations,
+	useAddEducation,
+	useUpdateEducation,
+	useDeleteEducation,
+} from '../api/EducationAPI';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 
@@ -79,11 +84,8 @@ const Main: React.FC = () => {
 	const [userName, setUserName] = useState('');
 
 	const [showModal, setShowModal] = useState(false);
-	const [selectedEducationId, setSelectedEducationId] = useState<
-		number | null
-	>(null);
-	const [editingEducation, setEditingEducation] =
-		useState<EducationData | null>(null);
+	const [selectedEducationId, setSelectedEducationId] = useState<number | null>(null);
+	const [editingEducation, setEditingEducation] = useState<EducationData | null>(null);
 
 	useEffect(() => {
 		const fetchUserData = async () => {
@@ -115,103 +117,16 @@ const Main: React.FC = () => {
 		fetchUserData();
 	}, []);
 
-	const queryClient = useQueryClient();
-
-	// Use React Query to fetch education data
-	const {
-		isLoading,
-		data: educations,
-		refetch,
-	} = useQuery<EducationData[]>(
-		'educations',
-		async () => {
-			const token = await getToken();
-			const response = await fetch(`${BASE_URL}/education`, {
-				headers: {
-					Authorization: `Bearer ${token}`,
-				},
-			});
-
-			if (!response.ok) {
-				throw new Error('Network response was not ok');
-			}
-
-			return response.json();
-		},
-		{
-			// Refetch the data on window focus or when the component mounts
-			refetchOnWindowFocus: true,
-			initialData:
-				queryClient.getQueryData<EducationData[]>('educations'), // Use initial data from the cache, if available
-		}
-	);
-
-	const addEducationMutation = useMutation(
-		async (newEducation: EducationData) => {
-			const token = await getToken();
-			const response = await fetch(`${BASE_URL}/education`, {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					Authorization: `Bearer ${token}`,
-				},
-				body: JSON.stringify(newEducation),
-			});
-
-			if (!response.ok) {
-				throw new Error('Failed to add education');
-			}
-
-			// Trigger a refetch to update the data
-			refetch();
-		}
-	);
-
-	const updateEducationMutation = useMutation(
-		async (updatedEducation: EducationData) => {
-			const token = await getToken();
-			const response = await fetch(
-				`${BASE_URL}/education/${updatedEducation.id}`,
-				{
-					method: 'PUT',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${token}`,
-					},
-					body: JSON.stringify(updatedEducation),
-				}
-			);
-
-			if (!response.ok) {
-				throw new Error('Failed to update education');
-			}
-
-			// Trigger a refetch to update the data
-			refetch();
-		}
-	);
-
-	const deleteEducationMutation = useMutation(async (id: number) => {
-		const token = await getToken();
-		const response = await fetch(`${BASE_URL}/education/${id}`, {
-			method: 'DELETE',
-			headers: {
-				Authorization: `Bearer ${token}`,
-			},
-		});
-
-		if (!response.ok) {
-			throw new Error('Failed to delete education');
-		}
-
-		// Trigger a refetch to update the data
-		refetch();
-	});
+	const { isLoading, educations, refetch } = useEducations();
+	const { addEducationMutation } = useAddEducation();
+	const { updateEducationMutation } = useUpdateEducation();
+	const { deleteEducationMutation } = useDeleteEducation();
 
 	if (isLoading) return <Loading />;
 
 	const handleAddEducation = (newEducation: EducationData) => {
 		addEducationMutation.mutate(newEducation);
+		refetch();
 		setShowModal(false);
 		setSelectedEducationId(null);
 	};
@@ -241,10 +156,17 @@ const Main: React.FC = () => {
 
 	return (
 		<MainContainer>
-			<UserButtonWrapper >
+			<UserButtonWrapper>
 				<UserButton />
 			</UserButtonWrapper>
-			<ContentContainer style={{ minHeight: educations && educations.length === 0 ? '100vh' : '25vh' }}>
+			<ContentContainer
+				style={{
+					minHeight:
+						educations && educations.length === 0
+							? '100vh'
+							: '25vh',
+				}}
+			>
 				<Title>Welcome to {userName}'s education showwcase</Title>
 				<AddButton onClick={() => setShowModal(true)}>
 					Add new education
@@ -253,7 +175,6 @@ const Main: React.FC = () => {
 			<EducationWrapper>
 				{educations && educations.length > 0 && (
 					<SidePanel>
-						{/* <SidePanelHeading>Education Highlights</SidePanelHeading> */}
 						<EducationHighlightList>
 							{educations
 								.slice()
