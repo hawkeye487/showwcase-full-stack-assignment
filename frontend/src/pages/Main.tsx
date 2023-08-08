@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EducationForm from '../components/EducationForm';
 import EducationList from '../components/EducationList';
 import styled from 'styled-components';
@@ -68,10 +68,15 @@ const UserButtonWrapper = styled.div`
 	right: 7%;
 `;
 
-const Main: React.FC = () => {
-	const { userId, getToken } = useAuth();
+const Title = styled.h2`
+	font-size: 25px;
+	// margin-bottom: 30px;
+	font-weight: 500;
+`;
 
-	console.log({ userId });
+const Main: React.FC = () => {
+	const { getToken } = useAuth();
+	const [userName, setUserName] = useState('');
 
 	const [showModal, setShowModal] = useState(false);
 	const [selectedEducationId, setSelectedEducationId] = useState<
@@ -79,6 +84,36 @@ const Main: React.FC = () => {
 	>(null);
 	const [editingEducation, setEditingEducation] =
 		useState<EducationData | null>(null);
+
+	useEffect(() => {
+		const fetchUserData = async () => {
+			try {
+				// Get the user's access token from Clerk
+				const accessToken = await getToken();
+
+				const response = await fetch(`${BASE_URL}/user`, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${accessToken}`, // Include the access token in the request headers
+					},
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to fetch user data.');
+				}
+
+				const data = await response.json();
+
+				// Set the user's name in the state
+				setUserName(data.name);
+			} catch (error) {
+				console.error('Error:', error);
+				// Handle the error if needed
+			}
+		};
+
+		fetchUserData();
+	}, []);
 
 	const queryClient = useQueryClient();
 
@@ -208,13 +243,13 @@ const Main: React.FC = () => {
 
 	return (
 		<MainContainer>
-			<UserButtonWrapper UserButtonWrapper>
+			<UserButtonWrapper >
 				<UserButton />
 			</UserButtonWrapper>
-			<ContentContainer>
-				<h2>Main Screen</h2>
+			<ContentContainer style={{ minHeight: educations && educations.length === 0 ? '100vh' : '25vh' }}>
+				<Title>Welcome to {userName}'s education showwcase</Title>
 				<AddButton onClick={() => setShowModal(true)}>
-					Add Education
+					Add new education
 				</AddButton>
 			</ContentContainer>
 			<EducationWrapper>

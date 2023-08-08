@@ -1,6 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@clerk/clerk-react';
+
+const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 
 const GetStartedContainer = styled.div`
 	font-family: 'Roboto', sans-serif;
@@ -13,9 +16,9 @@ const GetStartedContainer = styled.div`
 `;
 
 const Welcome = styled.h3`
-  font-size: 20px;
-  margin-bottom: 40px;
-  font-weight: 500;
+	font-size: 20px;
+	margin-bottom: 40px;
+	font-weight: 500;
 `;
 
 const Title = styled.h1`
@@ -73,18 +76,67 @@ const GetStarted: React.FC = () => {
 	const [userName, setUserName] = useState('');
 	const navigate = useNavigate();
 
-	const handleEnterClick = () => {
+	const { getToken } = useAuth();
+
+	useEffect(() => {
+		const fetchUserData = async () => {
+			try {
+				// Get the user's access token from Clerk
+				const accessToken = await getToken();
+
+				const response = await fetch(`${BASE_URL}/user`, {
+					method: 'GET',
+					headers: {
+						Authorization: `Bearer ${accessToken}`, // Include the access token in the request headers
+					},
+				});
+				const data = await response.json();
+
+				if (data.name) {
+					navigate('/main');
+				}
+			} catch (error) {
+				console.error('Error:', error);
+				// Handle the error if needed
+			}
+		};
+
+		fetchUserData();
+	}, []);
+
+	const handleEnterClick = async () => {
 		// Add your logic here to handle the user's input
 		if (userName.trim() !== '') {
-			console.log(`User name entered: ${userName}`);
-			navigate('/main'); // Navigate to the Main page
+			try {
+				// Get the user's access token from Clerk
+				const accessToken = await getToken();
+
+				const response = await fetch(`${BASE_URL}/user`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						Authorization: `Bearer ${accessToken}`, // Include the access token in the request headers
+					},
+					body: JSON.stringify({ name: userName }),
+				});
+
+				if (!response.ok) {
+					throw new Error('Failed to send data to the server.');
+				}
+
+				// If the POST request is successful, navigate to the Main page
+				navigate('/main');
+			} catch (error) {
+				console.error('Error:', error);
+				// Handle the error if needed
+			}
 		}
 	};
 
 	return (
 		<GetStartedContainer>
 			<Welcome>Hi there ! welcome to your education showwcase</Welcome>
-      <Title>Type your name and click "Enter" below to begin !</Title>
+			<Title>Type your name and click "Enter" below to begin !</Title>
 			<InputContainer>
 				<Input
 					type='text'
