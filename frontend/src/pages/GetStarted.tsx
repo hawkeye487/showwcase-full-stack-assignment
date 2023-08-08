@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
+import Loading from '../components/Loading';
 
 const BASE_URL = import.meta.env.VITE_BACKEND_API_BASE_URL;
 
@@ -75,54 +77,53 @@ const EnterButton = styled.button`
 const GetStarted: React.FC = () => {
 	const [userName, setUserName] = useState('');
 	const navigate = useNavigate();
-
+	const queryClient = useQueryClient();
 	const { getToken } = useAuth();
 
-	useEffect(() => {
-		const fetchUserData = async () => {
-			try {
-				// Get the user's access token from Clerk
-				const accessToken = await getToken();
+	const fetchUserData = async () => {
+		const accessToken = await getToken();
+		const response = await fetch(`${BASE_URL}/user`, {
+			method: 'GET',
+			headers: {
+				Authorization: `Bearer ${accessToken}`, 
+			},
+		});
+		const data = await response.json();
 
-				const response = await fetch(`${BASE_URL}/user`, {
-					method: 'GET',
-					headers: {
-						Authorization: `Bearer ${accessToken}`, // Include the access token in the request headers
-					},
-				});
-				const data = await response.json();
+		if (data.name) {
+			navigate('/main');
+		}
+	};
 
-				if (data.name) {
-					navigate('/main');
-				}
-			} catch (error) {
-				console.error('Error:', error);
-				// Handle the error if needed
-			}
-		};
+	const { isLoading, isError } = useQuery('userData', fetchUserData, {
+		onError: (error) => {
+			console.error('Error:', error);
+		},
+	});
 
-		fetchUserData();
-	}, []);
+	const addUserMutation = useMutation(async (newUser: any) => {
+		const accessToken = await getToken();
+		const response = await fetch(`${BASE_URL}/user`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Authorization: `Bearer ${accessToken}`,
+			},
+			body: JSON.stringify(newUser),
+		});
+
+		if (!response.ok) {
+			throw new Error('Failed to send data to the server.');
+		}
+	});
 
 	const handleEnterClick = async () => {
-		// Add your logic here to handle the user's input
 		if (userName.trim() !== '') {
 			try {
-				// Get the user's access token from Clerk
-				const accessToken = await getToken();
+				await addUserMutation.mutateAsync({ name: userName });
 
-				const response = await fetch(`${BASE_URL}/user`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-						Authorization: `Bearer ${accessToken}`, // Include the access token in the request headers
-					},
-					body: JSON.stringify({ name: userName }),
-				});
-
-				if (!response.ok) {
-					throw new Error('Failed to send data to the server.');
-				}
+				// Invalidate and refetch user data to trigger re-render in case of subsequent queries
+				queryClient.invalidateQueries('userData');
 
 				// If the POST request is successful, navigate to the Main page
 				navigate('/main');
@@ -133,10 +134,18 @@ const GetStarted: React.FC = () => {
 		}
 	};
 
+	if (isLoading) {
+		return <Loading />;
+	}
+
+	if (isError) {
+		return <div>Error fetching data</div>;
+	}
+
 	return (
 		<GetStartedContainer>
-			<Welcome>Hi there ! welcome to your education showwcase</Welcome>
-			<Title>Type your name and click "Enter" below to begin !</Title>
+			<Welcome>Hi there! Welcome to your education showcase</Welcome>
+			<Title>Type your name and click "Enter" below to begin!</Title>
 			<InputContainer>
 				<Input
 					type='text'

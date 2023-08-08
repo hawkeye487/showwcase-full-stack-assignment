@@ -11,6 +11,7 @@ import LandingPage from '../pages/LandingPage';
 import SignInPage from '../pages/SignInPage';
 import SignUpPage from '../pages/SignUpPage';
 import { QueryClientWrapper } from '../query/queryClient';
+import RedirectToMain from '../components/RedirectToMain';
 
 if (!import.meta.env.VITE_REACT_APP_CLERK_PUBLISHABLE_KEY) {
 	throw new Error('Missing Publishable Key');
@@ -33,7 +34,7 @@ const ClerkProviderWithRoutes: React.FC = () => {
 						element={
 							<>
 								<SignedIn>
-									<Main />
+									<RedirectToMain />
 								</SignedIn>
 								<SignedOut>
 									<LandingPage />
@@ -44,14 +45,9 @@ const ClerkProviderWithRoutes: React.FC = () => {
 					<Route
 						path='/get-started'
 						element={
-							<>
-								<SignedIn>
-									<GetStarted />
-								</SignedIn>
-								{/* <SignedOut>
-                        <GetStarted />
-                    </SignedOut> */}
-							</>
+							<SignedIn>
+								<GetStarted />
+							</SignedIn>
 						}
 					/>
 					<Route path='/sign-in/*' element={<SignInPage />} />
