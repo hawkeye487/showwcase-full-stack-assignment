@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { FaUniversity, FaCalendarAlt, FaEdit, FaTrash } from 'react-icons/fa';
+import {  FaEdit, FaTrash } from 'react-icons/fa';
 
 interface EducationCardProps {
   isSelected: boolean;
@@ -25,40 +25,6 @@ const StyledEducationCard = styled.div<{ isSelected: boolean }>`
   cursor: pointer;
 `;
 
-const EducationHeader = styled.h3`
-  margin-bottom: 8px;
-`;
-
-const SchoolIcon = styled(FaUniversity)`
-  font-size: 24px;
-  margin-right: 8px;
-`;
-
-const CalendarIcon = styled(FaCalendarAlt)`
-  font-size: 20px;
-  margin-right: 4px;
-`;
-
-const YearText = styled.p`
-  margin: 4px 0;
-  display: flex;
-  align-items: center;
-  font-size: 14px;
-  font-weight: 400;
-  color: #666;
-`;
-
-const DescriptionText = styled.p`
-  font-size: 16px;
-  font-weight: 400;
-  color: #333;
-  text-wrap: wrap;
-`;
-
-const PlaceholderText = styled.span`
-  font-style: italic;
-  color: #999;
-`;
 
 const EditButton = styled.button`
   position: absolute;

@@ -120,7 +120,6 @@ const Main: React.FC = () => {
 	// Use React Query to fetch education data
 	const {
 		isLoading,
-		error,
 		data: educations,
 		refetch,
 	} = useQuery<EducationData[]>(
@@ -210,7 +209,6 @@ const Main: React.FC = () => {
 	});
 
 	if (isLoading) return <Loading />;
-	if (error) return <div>Error fetching data: {error.message}</div>;
 
 	const handleAddEducation = (newEducation: EducationData) => {
 		addEducationMutation.mutate(newEducation);

@@ -16,6 +16,7 @@ export interface EducationData {
 
 const EducationHeader = styled.h3`
   margin-bottom: 8px;
+  font-weight: 500;
 `;
 
 const SchoolIcon = styled(FaUniversity)`
