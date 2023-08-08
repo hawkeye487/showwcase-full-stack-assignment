@@ -7,6 +7,7 @@
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"src/**/*.ts\"",
     "lint:fix": "eslint . --ext .ts --fix",
+    "dev": "ts-node src/app.ts",
     "prebuild": "npm run lint",
     "postbuild": "npm run format"
   },
