@@ -165,9 +165,14 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	}, [isOpen]);
 
 	const currentYear = new Date().getFullYear();
-	const years = Array.from({ length: currentYear - 1950 + 1 }, (_, index) =>
+	const years = Array.from({ length: currentYear - 1980 + 1 }, (_, index) =>
 		(currentYear - index).toString()
 	);
+
+	const endYears = Array.from(
+		{ length: 2030 - 1980 + 1 },
+		(_, index) => (1980 + index).toString()
+	).reverse();
 
 	// Function to fetch school suggestions using SWR
 	const fetcher = async (url: string) => {
@@ -176,9 +181,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 	};
 
 	const { data: suggestions } = useSWR<{ name: string }[]>(
-		education.school
-			? `${API_URL}?name=${education.school}`
-			: null,
+		education.school ? `${API_URL}?name=${education.school}` : null,
 		fetcher
 	);
 
@@ -219,6 +222,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
 			!education.endYear
 		) {
 			alert('Please fill in all mandatory fields.');
+			return;
+		}
+
+		// Validate start date and end date
+		const startDate = new Date(
+			`${education.startMonth} ${education.startYear}`
+		);
+		const endDate = new Date(`${education.endMonth} ${education.endYear}`);
+		if (startDate > endDate) {
+			alert('Start date cannot be greater than end date.');
 			return;
 		}
 
@@ -333,7 +346,8 @@ const EducationForm: React.FC<EducationFormProps> = ({
 				/>
 				<DateLabel>
 					Start Date
-					{(education.startMonth === '' || education.startYear === '') &&  (
+					{(education.startMonth === '' ||
+						education.startYear === '') && (
 						<MandatoryFieldMessage>
 							{' '}
 							(Required)
@@ -382,12 +396,16 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						))}
 					</SelectField>
 				</DatePickerContainer>
-				<DateLabel>End Date (or expected) {(education.endMonth === '' || education.endYear === '') &&  (
+				<DateLabel>
+					End Date (or expected){' '}
+					{(education.endMonth === '' ||
+						education.endYear === '') && (
 						<MandatoryFieldMessage>
 							{' '}
 							(Required)
 						</MandatoryFieldMessage>
-					)}</DateLabel>
+					)}
+				</DateLabel>
 				<DatePickerContainer>
 					<SelectField
 						value={education.endMonth}
@@ -422,7 +440,7 @@ const EducationForm: React.FC<EducationFormProps> = ({
 						}
 					>
 						<option value=''>Select Year</option>
-						{years.map((year) => (
+						{endYears.map((year) => (
 							<option key={year} value={year}>
 								{year}
 							</option>
